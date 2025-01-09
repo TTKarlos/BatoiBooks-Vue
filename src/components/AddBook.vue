@@ -1,187 +1,202 @@
 <template>
-    <div class="add-book">
-      <h2>Añadir Libro</h2>
-      
-      <form @submit.prevent="handleSubmit" class="book-form">
-        <div class="form-group">
-          <label for="moduleCode">Código de Módulo:</label>
-          <select 
-            id="moduleCode" 
-            v-model="bookData.moduleCode" 
-            required
-          >
-            <option value="">Selecciona un módulo</option>
-            <option v-for="module in modules" :key="module.code" :value="module.code">
-              {{ module.code }} - {{ module.cliteral }}
-            </option>
-          </select>
-        </div>
-  
-        <div class="form-group">
-          <label for="publisher">Editorial:</label>
-          <input 
-            type="text" 
-            id="publisher" 
-            v-model="bookData.publisher" 
-            required
-          >
-        </div>
-  
-        <div class="form-group">
-          <label for="price">Precio:</label>
-          <input 
-            type="number" 
-            id="price" 
-            v-model="bookData.price" 
-            step="0.01" 
-            min="0" 
-            required
-          >
-        </div>
-  
-        <div class="form-group">
-          <label for="pages">Páginas:</label>
-          <input 
-            type="number" 
-            id="pages" 
-            v-model="bookData.pages" 
-            min="1" 
-            required
-          >
-        </div>
-  
-        <div class="form-group">
-          <label>Estado:</label>
-          <div class="radio-group">
-            <label class="radio-label">
-              <input 
-                type="radio" 
-                v-model="bookData.status" 
-                value="new"
-                required
-              > Nuevo
-            </label>
-            <label class="radio-label">
-              <input 
-                type="radio" 
-                v-model="bookData.status" 
-                value="good"
-              > Bueno
-            </label>
-            <label class="radio-label">
-              <input 
-                type="radio" 
-                v-model="bookData.status" 
-                value="bad"
-              > Malo
-            </label>
-          </div>
-        </div>
-  
-        <div class="form-group">
-          <label for="comments">Comentarios:</label>
-          <textarea 
-            id="comments" 
-            v-model="bookData.comments"
-            rows="4"
-          ></textarea>
-        </div>
-  
-        <div class="form-actions">
-          <button type="submit">Añadir Libro</button>
-          <button type="reset" class="btn-secondary" @click="resetForm">
-            Limpiar
-          </button>
-        </div>
-      </form>
-    </div>
-  </template>
-  
-  <script setup>
-  import { reactive, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useBooksStore } from '../stores/books'
-  import { storeToRefs } from 'pinia'
-  
-  const router = useRouter()
-  const booksStore = useBooksStore()
-  const { modules } = storeToRefs(booksStore)
-  
-  const initialBookData = {
-    moduleCode: '',
-    publisher: '',
-    price: '',
-    pages: '',
-    status: '',
-    comments: ''
-  }
-  
-  const bookData = reactive({ ...initialBookData })
-  
-  const resetForm = () => {
-    Object.assign(bookData, initialBookData)
-  }
-  
-  const handleSubmit = async () => {
-    const success = await booksStore.addBook({
-      ...bookData,
-      price: Number(bookData.price),
-      pages: Number(bookData.pages)
-    })
+  <div class="add-book">
+    <h2>Añadir Libro</h2>
     
-    if (success) {
-      resetForm()
-      router.push('/')
-    }
+    <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{ errors }">
+      <div class="form-group">
+        <label for="moduleCode">Código de Módulo:</label>
+        <Field 
+          name="moduleCode" 
+          as="select"
+          :class="{ 'is-invalid': errors.moduleCode }"
+        >
+          <option value="">Selecciona un módulo</option>
+          <option v-for="module in modules" :key="module.code" :value="module.code">
+            {{ module.code }} - {{ module.cliteral }}
+          </option>
+        </Field>
+        <ErrorMessage name="moduleCode" class="error-message" />
+      </div>
+
+      <div class="form-group">
+        <label for="publisher">Editorial:</label>
+        <Field 
+          name="publisher" 
+          type="text"
+          :class="{ 'is-invalid': errors.publisher }"
+        />
+        <ErrorMessage name="publisher" class="error-message" />
+      </div>
+
+      <div class="form-group">
+        <label for="price">Precio:</label>
+        <Field 
+          name="price" 
+          type="number"
+          step="0.01"
+          :class="{ 'is-invalid': errors.price }"
+        />
+        <ErrorMessage name="price" class="error-message" />
+      </div>
+
+      <div class="form-group">
+        <label for="pages">Páginas:</label>
+        <Field 
+          name="pages" 
+          type="number"
+          :class="{ 'is-invalid': errors.pages }"
+        />
+        <ErrorMessage name="pages" class="error-message" />
+      </div>
+
+      <div class="form-group">
+        <label>Estado:</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <Field 
+              name="status" 
+              type="radio" 
+              value="new"
+            /> Nuevo
+          </label>
+          <label class="radio-label">
+            <Field 
+              name="status" 
+              type="radio" 
+              value="good"
+            /> Bueno
+          </label>
+          <label class="radio-label">
+            <Field 
+              name="status" 
+              type="radio" 
+              value="bad"
+            /> Malo
+          </label>
+        </div>
+        <ErrorMessage name="status" class="error-message" />
+      </div>
+
+      <div class="form-group">
+        <label for="comments">Comentarios:</label>
+        <Field 
+          name="comments" 
+          as="textarea"
+          rows="4"
+        />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">Añadir Libro</button>
+        <button type="reset" class="btn-secondary" @click="resetForm">
+          Limpiar
+        </button>
+      </div>
+    </Form>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { Form, Field, ErrorMessage } from 'vee-validate'
+import * as yup from 'yup'
+import { useBooksStore } from '../stores/books'
+import { storeToRefs } from 'pinia'
+
+const router = useRouter()
+const booksStore = useBooksStore()
+const { modules, books } = storeToRefs(booksStore)
+
+const schema = yup.object().shape({
+  moduleCode: yup.string().required('El código de módulo es obligatorio'),
+  publisher: yup.string().required('La editorial es obligatoria'),
+  price: yup
+    .number()
+    .typeError('El precio debe ser un número')
+    .min(0, 'El precio debe ser mayor o igual a 0')
+    .required('El precio es obligatorio'),
+  pages: yup
+    .number()
+    .typeError('El número de páginas debe ser un número')
+    .integer('El número de páginas debe ser un número entero')
+    .min(0, 'El número de páginas debe ser mayor o igual a 0')
+    .required('El número de páginas es obligatorio'),
+  status: yup.string().required('El estado es obligatorio'),
+  comments: yup.string()
+})
+
+const resetForm = () => {
+  // This will reset the form to its initial state
+  router.go(0)
+}
+
+const handleSubmit = async (values) => {
+  // Check if the book already exists for this user
+  const existingBook = books.value.find(
+    book => book.moduleCode === values.moduleCode && book.publisher === values.publisher
+  )
+
+  if (existingBook) {
+    alert('Ya has añadido este libro anteriormente.')
+    return
   }
-  
-  onMounted(() => {
-    booksStore.fetchModules()
+
+  const success = await booksStore.addBook({
+    ...values,
+    price: Number(values.price),
+    pages: Number(values.pages)
   })
-  </script>
   
-  <style scoped>
-  .add-book {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
+  if (success) {
+    resetForm()
+    router.push('/')
   }
-  
-  .book-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .radio-group {
-    display: flex;
-    gap: 2rem;
-  }
-  
-  .radio-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .radio-label input {
-    width: auto;
-  }
-  
-  .form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .btn-secondary {
-    background-color: #6c757d;
-  }
-  
-  .btn-secondary:hover {
-    background-color: #5a6268;
-  }
-  </style>
-  
+}
+
+onMounted(() => {
+  booksStore.fetchModules()
+})
+</script>
+
+<style scoped>
+.add-book {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--background-color);
+  border-radius: 8px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 2rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.radio-label input {
+  width: auto;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.is-invalid {
+  border-color: red;
+}
+</style>
+
