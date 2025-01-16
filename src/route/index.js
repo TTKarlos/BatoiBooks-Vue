@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import BooksList from '../components/BooksList.vue'
 import AddBook from '../components/AddBook.vue'
-import AppCart from '../components/AppCart.vue'
+import EditBook from '../components/EditBook.vue'
 import AppAbout from '../components/AppAbout.vue'
 
 const router = createRouter({
@@ -14,13 +14,13 @@ const router = createRouter({
     },
     {
       path: '/add',
-      name: 'add',
+      name: 'add-book',
       component: AddBook
     },
     {
-      path: '/cart',
-      name: 'cart',
-      component: AppCart
+      path: '/edit/:id',
+      name: 'edit-book',
+      component: EditBook
     },
     {
       path: '/about',

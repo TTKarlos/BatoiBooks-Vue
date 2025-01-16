@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <header>
-      <img src="" alt="BatoiBooks Logo" class="logo">
+      <img src="./assets/Batoi.jpeg" alt="BatoiBooks Logo" class="logo">
       <h1>BatoiBooks</h1>
     </header>
     

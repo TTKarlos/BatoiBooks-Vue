@@ -24,6 +24,16 @@ export const useBooksStore = defineStore('books', {
         this.loading = false
       }
     },
+    async fetchBook(id) {
+      const messagesStore = useMessagesStore()
+      try {
+        const response = await axios.get(`http://localhost:3000/books/${id}`)
+        return response.data
+      } catch (error) {
+        messagesStore.addMessage('Error al cargar el libro: ' + error.message, 'error')
+        return null
+      }
+    },
     async fetchModules() {
       const messagesStore = useMessagesStore()
       try {
@@ -48,6 +58,21 @@ export const useBooksStore = defineStore('books', {
         return true
       } catch (error) {
         messagesStore.addMessage('Error al añadir el libro: ' + error.message, 'error')
+        return false
+      }
+    },
+    async updateBook(id, book) {
+      const messagesStore = useMessagesStore()
+      try {
+        const response = await axios.put(`http://localhost:3000/books/${id}`, book)
+        const index = this.books.findIndex(b => b.id === id)
+        if (index !== -1) {
+          this.books[index] = response.data
+        }
+        messagesStore.addMessage('Libro actualizado correctamente', 'success')
+        return true
+      } catch (error) {
+        messagesStore.addMessage('Error al actualizar el libro: ' + error.message, 'error')
         return false
       }
     },

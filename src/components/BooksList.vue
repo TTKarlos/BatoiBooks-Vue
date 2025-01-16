@@ -36,12 +36,14 @@
               >
                 <ShoppingCartIcon class="icon" />
               </button>
-              <button
-                class="btn-secondary"
-                title="Editar libro"
-              >
-                <EditIcon class="icon" />
-              </button>
+              <RouterLink :to="{ name: 'edit-book', params: { id: book.id } }">
+                <button
+                  class="btn-secondary"
+                  title="Editar libro"
+                >
+                  <EditIcon class="icon" />
+                </button>
+              </RouterLink>
               <button 
                 class="btn-danger"
                 @click="handleDelete(book)"
@@ -55,7 +57,7 @@
       </tbody>
     </table>
 
-    <div class="total">
+    <div class="total mt-2">
       Total libros: {{ totalBooks }}
     </div>
   </div>
@@ -64,6 +66,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { RouterLink } from 'vue-router'
 import { Trash2Icon, ShoppingCartIcon, EditIcon } from 'lucide-vue-next'
 import { useBooksStore } from '../stores/books'
 import { useMessagesStore } from '../stores/messages'
@@ -96,6 +99,11 @@ onMounted(() => {
   color: #666;
 }
 
+.total {
+  text-align: right;
+  font-weight: bold;
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;
@@ -104,54 +112,6 @@ onMounted(() => {
 .icon {
   width: 16px;
   height: 16px;
-}
-
-.total {
-  margin-top: 1rem;
-  text-align: right;
-  font-weight: bold;
-}
-
-.btn-primary {
-  background-color: #007bff;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  border-radius: 0.25rem;
-  color: #fff;
-  cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
-}
-
-button:focus {
-  outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 </style>
 

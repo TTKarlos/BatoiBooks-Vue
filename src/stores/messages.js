@@ -5,19 +5,23 @@ export const useMessagesStore = defineStore('messages', {
     messages: []
   }),
   actions: {
-    addMessage(message) {
+    addMessage(message, type = 'info') {
+      const id = Date.now()
+
+      // Añadir el mensaje a la lista
       this.messages.push({
-        id: Date.now(),
+        id,
         text: message,
-        type: 'info'
+        type
       })
+
+      // Configurar eliminación automática después de 4 segundos
+      setTimeout(() => {
+        this.removeMessage(id)
+      }, 4000)
     },
     addError(message) {
-      this.messages.push({
-        id: Date.now(),
-        text: message,
-        type: 'error'
-      })
+      this.addMessage(message, 'error')
     },
     removeMessage(id) {
       this.messages = this.messages.filter(msg => msg.id !== id)
