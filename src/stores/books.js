@@ -9,7 +9,11 @@ export const useBooksStore = defineStore('books', {
     loading: false
   }),
   getters: {
-    totalBooks: (state) => state.books.length
+    totalBooks: (state) => state.books.length,
+    getModuleDescription: (state) => (moduleCode) => {
+      const module = state.modules.find(m => m.code === moduleCode)
+      return module ? module.cliteral : moduleCode
+    }
   },
   actions: {
     async fetchBooks() {

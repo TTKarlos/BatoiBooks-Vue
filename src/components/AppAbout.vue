@@ -15,21 +15,3 @@
     </div>
   </template>
   
-  <style scoped>
-  .about {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-  }
-  
-  ul {
-    margin: 1rem 0;
-    padding-left: 2rem;
-  }
-  
-  li {
-    margin-bottom: 0.5rem;
-  }
-  </style>

@@ -1,65 +1,114 @@
 <template>
-    <div class="cart">
-      <h2>Carrito de Compra</h2>
-      
-      <div v-if="items.length === 0" class="empty-cart">
-        El carrito está vacío
-      </div>
-      
-      <div v-else>
-        <ul class="cart-items">
-          <li v-for="item in items" :key="item.id" class="cart-item">
-            <span>{{ item.module }} - {{ item.editorial }}</span>
+  <div class="cart">
+    <h2>Carrito de Compra</h2>
+    
+    <div v-if="items.length === 0" class="empty-cart">
+      El carrito está vacío
+    </div>
+    
+    <div v-else>
+      <div class="book-grid">
+        <BookItem
+          v-for="item in items"
+          :key="item.id"
+          :book="item"
+          :module-description="getModuleDescription(item.moduleCode)"
+        >
+          <template #buttons>
             <button 
               class="btn-danger"
               @click="removeFromCart(item.id)"
+              title="Eliminar del carrito"
             >
-              <XIcon class="icon" />
+              <X class="icon" />
             </button>
-          </li>
-        </ul>
+          </template>
+        </BookItem>
+      </div>
+      
+      <div class="cart-summary">
+        <p><strong>Total libros:</strong> {{ items.length }}</p>
+        <p><strong>Importe total:</strong> {{ totalPrice.toFixed(2) }}€</p>
+      </div>
+      
+      <div class="cart-actions">
+        <button class="btn-primary" @click="checkout">Realizar compra</button>
+        <button class="btn-secondary" @click="clearCart">Vaciar carrito</button>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { storeToRefs } from 'pinia'
-  import { XIcon } from 'lucide-vue-next'
-  import { useCartStore } from '../stores/cart'
-  
-  const cartStore = useCartStore()
-  const { items } = storeToRefs(cartStore)
-  const { removeFromCart } = cartStore
-  </script>
-  
-  <style scoped>
-  .cart {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  .empty-cart {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-    font-style: italic;
-  }
-  
-  .cart-items {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .icon {
-    width: 16px;
-    height: 16px;
-  }
-  </style>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import * as LucideIcons from 'lucide-vue-next'
+import { useCartStore } from '../stores/cart'
+import { useBooksStore } from '../stores/books'
+import { useMessagesStore } from '../stores/messages'
+import BookItem from './BookItem.vue'
+
+// Importar íconos específicos de Lucide
+const { X } = LucideIcons
+
+const cartStore = useCartStore()
+const booksStore = useBooksStore()
+const messagesStore = useMessagesStore()
+
+const { items } = storeToRefs(cartStore)
+const { removeFromCart, clearCart } = cartStore
+const { getModuleDescription } = booksStore
+
+const totalPrice = computed(() => {
+  return items.value.reduce((total, item) => total + parseFloat(item.price), 0)
+})
+
+const checkout = () => {
+  messagesStore.addMessage('Compra realizada con éxito', 'success')
+  clearCart()
+}
+</script>
+
+<style>
+.cart {
+  padding: 20px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  color: #fff;
+  vertical-align: middle;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.book-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cart-summary {
+  margin-top: 20px;
+}
+
+.cart-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+</style>

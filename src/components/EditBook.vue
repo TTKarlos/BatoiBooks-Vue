@@ -73,13 +73,3 @@ onMounted(async () => {
   await loadBook()
 })
 </script>
-
-<style scoped>
-.edit-book {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: var(--background-color);
-  border-radius: 8px;
-}
-</style>

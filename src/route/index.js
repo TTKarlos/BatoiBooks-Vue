@@ -3,6 +3,7 @@ import BooksList from '../components/BooksList.vue'
 import AddBook from '../components/AddBook.vue'
 import EditBook from '../components/EditBook.vue'
 import AppAbout from '../components/AppAbout.vue'
+import AppCart from '../components/AppCart.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AppAbout
+    },
+    {
+      path: '/cart',
+      name: 'cart',
+      component: AppCart
     }
   ]
 })

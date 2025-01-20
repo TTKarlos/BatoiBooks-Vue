@@ -85,18 +85,4 @@
 
   
   </script>
-  
-  <style scoped>
-  .form-group {
-    margin-bottom: 1rem;
-  }
-  .radio-group {
-    display: flex;
-    gap: 1rem;
-  }
-  .form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  </style>
+ 

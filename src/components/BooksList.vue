@@ -6,56 +6,41 @@
       Cargando libros...
     </div>
     
-    <table v-else>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Código Módulo</th>
-          <th>Editorial</th>
-          <th>Precio</th>
-          <th>Páginas</th>
-          <th>Estado</th>
-          <th>Comentarios</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="book in books" :key="book.id">
-          <td>{{ book.id }}</td>
-          <td>{{ book.moduleCode }}</td>
-          <td>{{ book.publisher }}</td>
-          <td>{{ book.price }}€</td>
-          <td>{{ book.pages }}</td>
-          <td>{{ book.status }}</td>
-          <td>{{ book.comments }}</td>
-          <td>
-            <div class="actions">
-              <button 
-                class="btn-primary"
-                title="Añadir al carrito"
-              >
-                <ShoppingCartIcon class="icon" />
-              </button>
-              <RouterLink :to="{ name: 'edit-book', params: { id: book.id } }">
-                <button
-                  class="btn-secondary"
-                  title="Editar libro"
-                >
-                  <EditIcon class="icon" />
-                </button>
-              </RouterLink>
-              <button 
-                class="btn-danger"
-                @click="handleDelete(book)"
-                title="Eliminar libro"
-              >
-                <Trash2Icon class="icon" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else class="book-grid">
+      <BookItem
+        v-for="book in books"
+        :key="book.id"
+        :book="book"
+        :module-description="getModuleDescription(book.moduleCode)"
+        @delete="handleDelete"
+      >
+        <template #buttons>
+          <button 
+            class="btn-primary"
+            @click="addToCart(book)"
+            :disabled="isInCart(book.id)"
+            title="Añadir al carrito"
+          >
+            <ShoppingCartIcon class="icon" />
+          </button>
+          <RouterLink :to="{ name: 'edit-book', params: { id: book.id } }">
+            <button
+              class="btn-secondary"
+              title="Editar libro"
+            >
+              <EditIcon class="icon" />
+            </button>
+          </RouterLink>
+          <button 
+            class="btn-danger"
+            @click="handleDelete(book.id, book.moduleCode)"
+            title="Eliminar libro"
+          >
+            <Trash2Icon class="icon" />
+          </button>
+        </template>
+      </BookItem>
+    </div>
 
     <div class="total mt-2">
       Total libros: {{ totalBooks }}
@@ -64,54 +49,36 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import { Trash2Icon, ShoppingCartIcon, EditIcon } from 'lucide-vue-next'
 import { useBooksStore } from '../stores/books'
+import { useCartStore } from '../stores/cart'
 import { useMessagesStore } from '../stores/messages'
+import BookItem from './BookItem.vue'
 
 const booksStore = useBooksStore()
+const cartStore = useCartStore()
 const messagesStore = useMessagesStore()
 
 const { books, loading, totalBooks } = storeToRefs(booksStore)
+const { getModuleDescription } = booksStore
 
-const handleDelete = async (book) => {
-  if (confirm(`¿Estás seguro de borrar el libro con ID ${book.id} y código ${book.moduleCode}?`)) {
-    await booksStore.deleteBook(book.id)
+const handleDelete = async (id, moduleCode) => {
+  if (confirm(`¿Estás seguro de borrar el libro con ID ${id} y código ${moduleCode}?`)) {
+    await booksStore.deleteBook(id)
   }
 }
+
+const addToCart = (book) => {
+  cartStore.addToCart(book)
+  messagesStore.addMessage('Libro añadido al carrito', 'success')
+}
+
+const isInCart = computed(() => (id) => cartStore.items.some(item => item.id === id))
 
 onMounted(() => {
   booksStore.fetchBooks()
 })
 </script>
-
-<style scoped>
-.books-list {
-  margin: 2rem 0;
-}
-
-.loading {
-  text-align: center;
-  padding: 2rem;
-  font-style: italic;
-  color: #666;
-}
-
-.total {
-  text-align: right;
-  font-weight: bold;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.icon {
-  width: 16px;
-  height: 16px;
-}
-</style>
-
